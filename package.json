@@ -3,6 +3,13 @@
   "private": true,
   "devDependencies": {
     "lerna": "^4.0.0",
-    "typescript": "^4.2.3"
+    "typescript": "^4.2.3",
+    "concurrently": "^6.0.0"
+  },
+  "scripts": {
+    "bootstrap": "yarn install && lerna bootstrap --npm-client=yarn",
+    "install-in-pkg": "lerna add --scope",
+    "start-app-frontend": "concurrently -r \"cd packages/app-frontend && yarn start\"",
+    "start-app-backend": "concurrently -r \"cd packages/app-backend && yarn start\""
   }
 }
