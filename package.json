@@ -10,6 +10,7 @@
     "bootstrap": "yarn install && lerna bootstrap --npm-client=yarn",
     "install-in-pkg": "lerna add --scope",
     "start-app-frontend": "concurrently -r \"cd packages/app-frontend && yarn start\"",
-    "start-app-backend": "concurrently -r \"cd packages/app-backend && yarn start\""
+    "start-app-backend": "concurrently -r \"cd packages/app-backend && yarn start\"",
+    "start-app-all": "concurrently -n='app-frontend,app-backend' \"npm run start-app-frontend\" \"npm run start-app-backend\""
   }
 }
