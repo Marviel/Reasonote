@@ -1,12 +1,5 @@
+import { ReasonoteExercise } from "./ReasonoteExercise";
 import * as z from 'zod';
-
-export const ReasonoteExercise = z.object({
-    exerciseType: z.string(),
-    id: z.string().uuid(),
-    name: z.string(),
-    skills: z.array(z.tuple([z.string(), z.number()]))
-});
-export type ReasonoteExercise = z.infer<typeof ReasonoteExercise>;
 
 export const ReasonoteFlashCardExercise = ReasonoteExercise.extend({
     exerciseType: z.literal("@reasonote/flash-card-exercise"),
