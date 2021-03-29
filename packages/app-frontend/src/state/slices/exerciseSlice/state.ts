@@ -1,5 +1,6 @@
 import { createEntityAdapter } from "@reduxjs/toolkit"
-import { ReasonoteExercise, ReasonoteFlashCardExercise } from "../../../models/Exercise"
+import { ReasonoteExercise } from "../../../models/Exercise/ReasonoteExercise"
+import { ReasonoteFlashCardExercise } from "../../../models/Exercise/ReasonoteFlashCardExercise"
 
 /**
  * A helper for creating this state slice
