@@ -8,6 +8,8 @@ import {
 } from 'connected-react-router';
 import { createBrowserHistory, History } from 'history'
 import exercisesReducer from './slices/exerciseSlice'
+import conceptsReducer from './slices/conceptSlice'
+import userConceptsReducer from './slices/userConceptSlice'
 
 // This is a reducer which will cache the last action executed
 // on the state. It technically breaks Redux's focus on predictability
@@ -26,6 +28,8 @@ const rootReducer = combineReducers({
   router: connectRouter(history),
   unsafeLastAction,
   exercises: exercisesReducer,
+  concepts: conceptsReducer,
+  userConcepts: userConceptsReducer,
 })
 
 const store = configureStore({
