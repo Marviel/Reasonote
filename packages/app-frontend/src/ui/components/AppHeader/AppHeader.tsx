@@ -30,7 +30,7 @@ export function AppHeader(){
                 columnGap: "5px",
                 color: "lightgray"
             }}>
-                <h3 onClick={() => dispatch(push("/exercise"))}>Exercise</h3>
+                <h3 onClick={() => dispatch(push("/exercises"))}>Exercise</h3>
                 <h3 onClick={() => dispatch(push("/explore"))}>Explore</h3>
             </div>
         </div>        
