@@ -3,7 +3,7 @@ import {useParams} from 'react-router-dom'
 import {useSelector} from 'react-redux';
 import { selectExerciseById } from '../../../state/slices/exerciseSlice/selectors';
 import { RootState } from '../../../state/store';
-import { isReasonoteFlashCardExercise } from '../../../models/Exercise';
+import { isReasonoteFlashCardExercise } from '../../../models/Exercise/ReasonoteFlashCardExercise';
 import { FlashCardExercise } from '../../components/Exercises/FlashCardExercise/FlashCardExercise';
 
 export function ExercisePage(){
@@ -19,7 +19,9 @@ export function ExercisePage(){
     }}>
         {
             isReasonoteFlashCardExercise(exercise) ?
-                <FlashCardExercise flashCard={exercise} />
+                <FlashCardExercise 
+                    key={exercise && exercise.id}
+                    flashCard={exercise} />
                 :
                 <div>Non-Flash card exercises coming soon</div>
         }
