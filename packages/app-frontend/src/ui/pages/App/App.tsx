@@ -10,6 +10,7 @@ import {
 } from "react-router-dom";
 import { Exercises } from '../ExercisesPage/ExercisesPage';
 import { ExercisePage } from '../ExercisePage/ExercisePage';
+import { FlashCardExerciseCreator } from '../../components/Exercises/FlashCardExercise/FlashCardExerciseCreator';
 
 function App() {
   return (
@@ -18,6 +19,9 @@ function App() {
         <Switch>
             <Route exact path="/">
               <Redirect to="/start"/>
+            </Route>
+            <Route exact path="/exercises/create">
+              <FlashCardExerciseCreator />
             </Route>
             <Route exact path="/exercises">
               <Exercises />
