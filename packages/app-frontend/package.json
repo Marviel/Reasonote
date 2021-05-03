@@ -21,6 +21,7 @@
     "@types/redux": "^3.6.0",
     "@types/uuid": "^8.3.0",
     "connected-react-router": "^6.9.1",
+    "firebase": "^8.3.3",
     "history": "4.9.0",
     "lodash": "^4.17.21",
     "react": "^17.0.1",
@@ -36,7 +37,8 @@
     "uuid": "^8.3.2",
     "web-vitals": "^1.0.1",
     "ws": "^7.4.4",
-    "zod": "3.0.0-alpha.4"
+    "zod": "3.0.0-alpha.4",
+    "@reasonote/services": "*"
   },
   "scripts": {
     "start": "react-scripts start",
