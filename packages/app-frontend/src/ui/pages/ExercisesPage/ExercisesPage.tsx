@@ -1,8 +1,15 @@
-import React from 'react';
+import { CircularProgress } from '@material-ui/core';
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { beginNextExercise } from '../../../state/slices/multiSliceActions';
 
 export function Exercises(){
+    const dispatch = useDispatch()
+    useEffect(() => {
+        dispatch(beginNextExercise("DUMMY_USER"))
+    }, [])
+
     return <div>
-            <h1>Exercises Page</h1>
-            <h2>Work in Progress</h2>
+        <CircularProgress/>
         </div> 
 }

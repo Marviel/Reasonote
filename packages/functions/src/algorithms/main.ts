@@ -254,3 +254,4 @@ export function generateNextReviewTime(grade: number, concept: CombinedUserConce
         newDate: new Date(concept.srsData.nextReviewTime.getTime() + (options.baseReviewIntervalMS*newInterval)),
     }
 }
+

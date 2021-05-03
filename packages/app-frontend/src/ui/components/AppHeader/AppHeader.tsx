@@ -27,11 +27,15 @@ export function AppHeader(){
             <div style={{
                 display: "grid",
                 gridAutoFlow: "column",
-                columnGap: "5px",
-                color: "lightgray"
+                columnGap: "10px",
+                color: "lightgray",
+                paddingLeft: "15px",
+                justifyItems: "center",
+                alignItems: "center",
             }}>
-                <h3 onClick={() => dispatch(push("/exercises"))}>Exercise</h3>
-                <h3 onClick={() => dispatch(push("/explore"))}>Explore</h3>
+                <h5 style={{cursor: "pointer"}} onClick={() => dispatch(push("/exercises"))}>Practice</h5>
+                <h5 style={{cursor: "pointer"}} onClick={() => dispatch(push("/exercises/create"))}>New Exercise</h5>
+                <h5 style={{cursor: "pointer"}} onClick={() => dispatch(push("/concepts/create"))}>New Concept</h5>
             </div>
         </div>        
     </header>

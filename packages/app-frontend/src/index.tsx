@@ -13,6 +13,9 @@ import { uuid } from './utils/uuidUtils';
 import { notEmpty } from './utils/typeUtils';
 import { userConceptAdded } from './state/slices/userConceptSlice';
 import { UserConcept } from './models/UserConcept';
+import { fbdb } from './services';
+import { synchronizers } from './synch';
+import firebase from 'firebase';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -32,17 +35,10 @@ ReactDOM.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-_.values(store.getState().concepts.entities).filter(notEmpty).forEach(async (concept) => {
-  const userConcept: UserConcept = {
-    id: uuid(),
-    userId: "DUMMY_USER",
-    conceptId: concept.id,
-    successfulConsecutiveReviews: 0,
-    srsData: {
-        srsDataType: "SuperMemo2SRSData",
-        easinessFactor: 2.5,
-        nextReviewTime: new Date()
-    }
-  }
-  store.dispatch(userConceptAdded(userConcept))
+// TODO DEV remove
+firebase.functions().useEmulator("localhost", 5001);
+
+// Setup every synchronizer with access to the store.
+synchronizers.forEach((f) => {
+  f(() => store)
 })

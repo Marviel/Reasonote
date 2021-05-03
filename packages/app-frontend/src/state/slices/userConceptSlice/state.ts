@@ -16,3 +16,4 @@ const initialState = userConceptsAdapter.getInitialState({
 
 
 export const userConceptsInitialState = initialState;
+export type UserConceptStateType = typeof initialState;

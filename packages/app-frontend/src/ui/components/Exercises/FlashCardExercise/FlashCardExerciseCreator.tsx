@@ -4,16 +4,26 @@ import {useDispatch, useSelector} from 'react-redux';
 import { ReasonoteFlashCardExercise } from '../../../../models/Exercise/ReasonoteFlashCardExercise';
 import {Button, Chip, TextField} from "@material-ui/core"
 import { AppDispatch } from '../../../../state/store';
-import { beginNextExercise, createFlashCardExercise, submitExerciseGrade } from '../../../../state/slices/multiSliceActions';
+import { beginNextExercise, createFlashCardExercise} from '../../../../state/slices/multiSliceActions';
+import { ConceptSearcher } from '../../Concepts/ConceptSearcher';
+import { Concept } from '../../../../models/Concept';
 
 export function FlashCardExerciseCreator(){
     const dispatch = useDispatch<AppDispatch>();
 
     const [prompt, setPrompt] = useState<string>("");
     const [answer, setAnswer] = useState<string>("");
+    const [concepts, setConcepts] = useState<Concept[]>([]);
 
     const onCreate = async () => {
-        await dispatch(createFlashCardExercise(prompt, answer))
+        await dispatch(createFlashCardExercise(
+            prompt, 
+            answer, 
+            concepts.map((c) => ({subject: c.id, strength: 1})),
+        ))
+
+        setPrompt("")
+        setAnswer("")
     }
 
     return <div style={{
@@ -25,16 +35,21 @@ export function FlashCardExerciseCreator(){
         borderStyle: "solid",
         borderRadius: "10px",
         padding: "10px",
+        width: "33vw",
     }}>
-        <h1>
+        <h2>
             Prompt
-        </h1>
-        <TextField onChange={(ev) => setPrompt(ev.target.value)}/>
-
-        <h1>
+        </h2>
+        <TextField value={prompt} onChange={(ev) => setPrompt(ev.target.value)}/>
+        <h2>
             Answer
-        </h1>
-        <TextField onChange={(ev) => setAnswer(ev.target.value)}/>
+        </h2>
+        <TextField value={answer} onChange={(ev) => setAnswer(ev.target.value)}/>
+
+        <h2>
+            Concepts
+        </h2>
+        <ConceptSearcher selectionChangedCallback={(cs) => setConcepts(cs)}/>
 
         <Button onClick={() => onCreate()}>Create</Button>
     </div>

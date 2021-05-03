@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import admin, { firestore } from 'firebase-admin';
-import {getNextExercise as getNextExerciseFunc} from './algorithms/main'
+import {generateNextReviewTime, getNextExercise as getNextExerciseFunc} from './algorithms/main'
 import { UserConcept } from "./models/UserConcept";
 import { Concept } from "./models/Concept";
 import { ReasonoteExercise } from "./models/Exercise/ReasonoteExercise";
@@ -8,6 +8,11 @@ import _ from "lodash";
 import { notEmpty } from "./utils/typeUtils";
 import { uuid } from "./utils/uuidUtils";
 import cors from 'cors';
+import * as z from 'zod';
+import Exercise from "./services/Exercise";
+import ConceptService from "./services/ConceptService";
+import UserConceptService from "./services/UserConceptService";
+import { normalizeFirestoreData } from "./utils/firebaseUtils";
 const corsHandler = cors({origin: true});
 
 admin.initializeApp();
@@ -33,8 +38,8 @@ async function dataFromQuery(snapshot: FirebaseFirestore.Query<FirebaseFirestore
   return (await snapshot.get()).docs.map(doc => doc.data())
 }
 
-function makeUserConceptForConcept(concepts: Concept[], userId: string){
-  return _.values(concepts).filter(notEmpty).forEach(async (concept) => {
+async function makeUserConceptForConcept(concepts: Concept[], userId: string){
+  return Promise.all(_.values(concepts).filter(notEmpty).map(async (concept) => {
     const userConcept: UserConcept = {
       id: uuid(),
       userId: userId,
@@ -47,22 +52,7 @@ function makeUserConceptForConcept(concepts: Concept[], userId: string){
       }
     }
 
-    await db.collection("userConcepts").doc(userConcept.id).set(userConcept)
-  })
-}
-
-function normalizeFirestoreData(dat: {[k: string]: any}): any {
-  return _.fromPairs(Object.keys(dat).map((k) => {
-    
-    const v = dat[k];
-    if(v instanceof firestore.Timestamp){
-      return [k, v.toDate()]
-    } else if (typeof v === 'object' && v !== null){
-      return [k, normalizeFirestoreData(v)]
-    }
-    else {
-      return [k, v]
-    }
+    return await db.collection("userConcepts").doc(userConcept.id).set(userConcept)
   }))
 }
 
@@ -129,5 +119,92 @@ export const getNextExercise = functions.https.onRequest(async (request, respons
     const result = getNextExerciseFunc(userCombined, exercises, {})
     response.set('Access-Control-Allow-Origin', '*')
     response.json(result ? {"data": result} : {"data": {}, "error": "Could not get Next Exercise Function."})
+  })
+})
+
+
+export const SubmitExerciseGradeRequest = z.object({
+  data: z.object({
+    userId: z.string(),
+    exerciseId: z.string(),
+    grade: z.number(),
+  })
+});
+export type SubmitExerciseGradeRequest = z.infer<typeof SubmitExerciseGradeRequest>;
+
+export const submitExerciseGrade = functions.https.onRequest(async (request, response) => {
+  corsHandler(request, response, async () => {
+    try {
+      functions.logger.info("Hello logs!, got data ", {structuredData: true, body: request.body});
+      const {
+        data: {
+          userId,
+          exerciseId,
+          grade,
+        }
+      } = SubmitExerciseGradeRequest.parse(request.body);
+
+      // Get the exercise
+      const exercise = (await Exercise.getExercisesById(db, exerciseId))[0];
+
+      // Calculation locally (for now)
+      // - For every concept in the exercise, we must update its comprehension score and next review time.
+      exercise?.skills.forEach(async (skill) => {
+          const concept = (await ConceptService.getConceptsById(db, skill.subject))[0];
+
+          if (concept){
+            const uc = await UserConceptService.getUserConceptNaturally(db, userId, concept.id)
+
+            if (!uc){
+              await makeUserConceptForConcept([concept], userId)
+            }
+
+            const userConcept = await UserConceptService.getUserConceptNaturally(db, userId, concept.id)
+
+            // TODO there should always be one here...
+            // Error out if not.
+            if (userConcept){
+              const combinedUserConcept = {
+                ...userConcept,
+                ...concept,
+                userId,
+                conceptId: concept.id,
+              }
+
+              const {newEasinessFactor, newDate, newSuccessfulConsecutiveReviews} = generateNextReviewTime(
+                  grade, 
+                  combinedUserConcept, 
+                  { algorithm: "SuperMemo2SRSData", baseReviewIntervalMS: 1000 * 60 * 60}
+              )
+              console.log(`concept: ${concept.name}\neasiness ${combinedUserConcept.comprehensionScore} -> ${newEasinessFactor}\nSuccessful Consecutive Reviews ${combinedUserConcept.successfulConsecutiveReviews} -> ${newSuccessfulConsecutiveReviews} after grade: ${grade}`)
+              
+              // Take the output of generateNextReviewTime and use it to 
+              // adjust the UserConcept's next review time and ComprehensionScore
+              UserConceptService.updateUserConcept(db, userConcept.id, {
+                  // TODO we are going against Retain here, because 
+                  // our exercises are not expected to be as "cardinal truth"
+                  // as a true user recommendation of comprehension.
+                  comprehensionScore: newEasinessFactor,
+                  successfulConsecutiveReviews: newSuccessfulConsecutiveReviews,
+                  srsData: {
+                      ...userConcept.srsData,
+                      nextReviewTime: newDate,
+                      easinessFactor: newEasinessFactor 
+                  },
+              })
+
+              response.set('Access-Control-Allow-Origin', '*')
+              response.json({data: {success: true}})
+            }
+            else {
+              functions.logger.error("Something went wrong, didn't have userConcept even after we should have made it.", {structuredData: true}); 
+            }
+        }
+      })
+    }
+    catch(err){
+      console.error(err)
+      response.json({body: {errors: [{code: 1, name: "Could not run."}]}, errors: {}})
+    }
   })
 })

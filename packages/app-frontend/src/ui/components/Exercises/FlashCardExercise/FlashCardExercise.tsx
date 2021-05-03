@@ -4,8 +4,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import { ReasonoteFlashCardExercise } from '../../../../models/Exercise/ReasonoteFlashCardExercise';
 import {Button, Chip, Typography} from "@material-ui/core"
 import { AppDispatch } from '../../../../state/store';
-import { beginNextExercise, submitExerciseGrade } from '../../../../state/slices/multiSliceActions';
+import { beginNextExercise} from '../../../../state/slices/multiSliceActions';
 import { ConceptTreeNestedList } from '../ConceptTree/ConceptTreeNestedList';
+import firebase from 'firebase';
 
 export interface IFlashCardExerciseProps {
     flashCard: ReasonoteFlashCardExercise
@@ -18,8 +19,8 @@ export function FlashCardExercise(props: IFlashCardExerciseProps){
     } = props;
 
     const [isComplete, setIsComplete] = useState(false);
-    const onGrade = async (grade: number) => {
-        await dispatch(submitExerciseGrade(flashCard.id, "DUMMY_USER", grade))
+    const onGrade = async (grade: number) => {        
+        const result = await firebase.functions().httpsCallable("submitExerciseGrade")({exerciseId: flashCard.id, userId: "DUMMY_USER", grade})
         await dispatch(beginNextExercise("DUMMY_USER"))
     }
 

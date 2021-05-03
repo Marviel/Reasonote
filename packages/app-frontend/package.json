@@ -5,7 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
-    "@reasonote/reasonote-main-backend": "0.1.0",
+    "@material-ui/lab": "^4.0.0-alpha.58",
     "@reduxjs/toolkit": "^1.5.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
@@ -37,8 +37,7 @@
     "uuid": "^8.3.2",
     "web-vitals": "^1.0.1",
     "ws": "^7.4.4",
-    "zod": "3.0.0-alpha.4",
-    "@reasonote/services": "*"
+    "zod": "3.0.0-alpha.4"
   },
   "scripts": {
     "start": "react-scripts start",

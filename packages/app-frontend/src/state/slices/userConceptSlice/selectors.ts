@@ -1,6 +1,7 @@
 import { EntityId } from '@reduxjs/toolkit';
 import _ from 'lodash';
 import { UserConcept } from '../../../models/UserConcept';
+import { isSynchedDown } from '../../../synch/PendingDownSynch';
 import { notEmpty } from '../../../utils/typeUtils';
 import { RootState } from '../../store';
 import { selectConceptById } from '../conceptSlice';
@@ -27,12 +28,10 @@ export const selectUserConceptNaturally = (state: RootState, userId: string, con
 export const selectUserCombinedConcepts = (state: RootState) => {
     const userConcepts = selectAllUserConcepts(state);
 
-    console.log("userConcepts here", userConcepts)
-
     return userConcepts.map((uc) => {
         const concept = selectConceptById(state, uc.conceptId);
 
-        return concept ? {
+        return concept && isSynchedDown(concept) ? {
             ...uc,
             ...concept
         } : undefined;

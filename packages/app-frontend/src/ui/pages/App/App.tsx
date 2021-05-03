@@ -11,6 +11,8 @@ import {
 import { Exercises } from '../ExercisesPage/ExercisesPage';
 import { ExercisePage } from '../ExercisePage/ExercisePage';
 import { FlashCardExerciseCreator } from '../../components/Exercises/FlashCardExercise/FlashCardExerciseCreator';
+import { ResetDataPage } from '../ResetDataPage/ResetDataPage';
+import { ConceptCreator } from '../../components/Concepts/ConceptCreator';
 
 function App() {
   return (
@@ -23,11 +25,17 @@ function App() {
             <Route exact path="/exercises/create">
               <FlashCardExerciseCreator />
             </Route>
+            <Route exact path="/concepts/create">
+              <ConceptCreator />
+            </Route>
             <Route exact path="/exercises">
               <Exercises />
             </Route>
             <Route exact path="/exercises/:exerciseId">
               <ExercisePage />
+            </Route>
+            <Route exact path="/reset-data">
+              <ResetDataPage />
             </Route>
         </Switch>
     </div>
